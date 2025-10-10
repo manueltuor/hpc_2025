@@ -6,3 +6,35 @@
 	•	Finalization overhead (MPI_Finalize)
 	•	Any other minor setup/teardown costs
 	•	The serial execution time (1.51 s) is roughly between those two values because it has no MPI overhead but does include the whole computation.
+
+## Exercise 2
+
+[eiger][mtuor@eiger-ln004 exercise_session_03]$ ./sum_O0
+sum=10022429073.341873
+Elapsed time: 4.916411 seconds
+No optimization, code runs exactly as written.
+
+[eiger][mtuor@eiger-ln004 exercise_session_03]$ ./sum_O1
+sum=10022429073.341873
+Elapsed time: 1.956954 seconds
+Removes some redundant instructions, simple inlining.
+
+[eiger][mtuor@eiger-ln004 exercise_session_03]$ ./sum_O2
+sum=10022429073.341873
+Elapsed time: 1.077999 seconds
+Loop optimizations, instruction scheduling, better inlining.
+
+[eiger][mtuor@eiger-ln004 exercise_session_03]$ ./sum_O3
+sum=10022429073.341873
+Elapsed time: 1.082061 seconds
+Aggressive optimizations, vectorization, auto-parallelization in some cases.
+
+Other Ways to Get Timings
+
+Besides getTime(), other ways to get timings:
+clock() (from time.h) – measures CPU time.
+omp_get_wtime() – high-resolution timer for OpenMP parallel regions.
+
+How to make it even faster?
+Parallelize the main loop
+

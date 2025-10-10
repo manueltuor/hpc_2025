@@ -1,8 +1,8 @@
 # Exercise Session 03 #
-In this session, you will work on modularization of the code and compilation optimization. Moreover, you will parallelize a simple code and successively plot its speedup. 
-
-In this folder you can find:
-
-* cpi.c : the serial version of last week parallel code, needed for Exercise 1
-* cpi_mpi.c : the MPI version of cpi code, for Exercise 1
-* sum.c : the code needed for Exercise 2 
+## Exercise 1
+	•	tWElapsed (1.477 s) measures only the time spent inside the computation loop using MPI_Wtime().
+	•	tEnd - tStart (1.607 s) measures the total wall-clock time, including:
+	•	Startup costs of the MPI environment (MPI_Init)
+	•	Finalization overhead (MPI_Finalize)
+	•	Any other minor setup/teardown costs
+	•	The serial execution time (1.51 s) is roughly between those two values because it has no MPI overhead but does include the whole computation.

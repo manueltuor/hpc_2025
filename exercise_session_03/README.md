@@ -44,3 +44,7 @@ Parallelize the main loop
 
 The line was inserted right before the for loop. The code was compiled as follows: cc -O3 -fopenmp sum.c getTime.c -o sum_parallel -lm.
 
+### Exercise 2.3
+
+As you can see on the plot the speedup is between linear and exponential.
+

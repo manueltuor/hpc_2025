@@ -48,3 +48,11 @@ The line was inserted right before the for loop. The code was compiled as follow
 
 As you can see on the plot the speedup is between linear and exponential.
 
+### Exercise 3
+
+#### Cache Effects
+Each CPU core has its own L1/L2/L3 caches. In a serial run, the working dataset might not fit in the CPU cache, so memory accesses frequently go to slower RAM. When you parallelize, each core works on a smaller chunk of data: That chunk may fit entirely in cache, drastically reducing memory access time. This can make the parallel execution faster than simply dividing the serial time by N, hence superlinear speedup.
+
+#### System and Scheduling Effects
+On HPC clusters, running a single serial job might get less optimal CPU allocation. When parallelized, the scheduler might assign faster nodes or less contended resources, giving a boost.
+

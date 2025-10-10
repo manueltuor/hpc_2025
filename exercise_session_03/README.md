@@ -9,6 +9,8 @@
 
 ## Exercise 2
 
+### Exercise 2.1
+
 [eiger][mtuor@eiger-ln004 exercise_session_03]$ ./sum_O0
 sum=10022429073.341873
 Elapsed time: 4.916411 seconds
@@ -37,4 +39,8 @@ omp_get_wtime() – high-resolution timer for OpenMP parallel regions.
 
 How to make it even faster?
 Parallelize the main loop
+
+### Exercise 2.2
+
+The line was inserted right before the for loop. The code was compiled as follows: cc -O3 -fopenmp sum.c getTime.c -o sum_parallel -lm.
 

@@ -29,4 +29,14 @@
 4. Contain at least three times a 1: 1.*1.*1
 5. Contain at least three consecutive 1s: 111
 
+## Exercise 3
+
+- The factor command returns the prime factorization of an input, so 20 returns 2, 2, 5 and 31 returns 31.
+- Time results:\n
+  [eiger][mtuor@eiger-ln004 exercise_session_04]$ ./isprime.sh 4230283
+    4230283 is prime Execution time: 0.004035 seconds
+    [eiger][mtuor@eiger-ln004 exercise_session_04]$ ./isprime.sh 4572862171001
+    4572862171001 is prime
+    Execution time: 0.003996 seconds
+
 

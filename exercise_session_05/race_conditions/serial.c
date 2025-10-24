@@ -54,9 +54,8 @@ int main(int argc, char *argv[]){
 
     // first loop
     int maxval = 0;
-    # pragma omp parallel for
+    # pragma omp parallel for reduction(max:maxval)
     for (int i=0;i<num_size;i++) {
-	 #pragma omp critical
 	 if (numbers[i] > maxval) {
 		 maxval = numbers[i];
 	}
@@ -65,10 +64,9 @@ int main(int argc, char *argv[]){
 
     // second loop
     int num_n0 = 0;
-    # pragma omp parallel for
+    # pragma omp parallel for reduction(+:num_n0)
     for (int i=0;i<num_size;i++) { 
-	if (numbers[i] == 0) { 
-		#pragma omp atomic
+	if (numbers[i] == 0) {
 		num_n0++;
 	}
     }

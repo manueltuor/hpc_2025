@@ -16,50 +16,55 @@ int close_MPI(){
 	return 0;
 }
 
-int mpi_get_domain(int nx, int ny, int my_rank, int size, int* min_x, int* max_x, int* min_y, int* max_y){
-	/*
-	define corners or local domains
-	*/
-    printf("in mpi_get_domain() in mpi_module.cpp,  define corners of the local domains\n");
+int mpi_get_domain(int nx, int ny, int my_rank, int size, int* min_x, int* max_x, int* min_y, int* max_y) {
+    int base = nx / size;
+    int rest = nx % size;
 
-	printf("I am rank %d and my domain is: xmin, xmax, ymin, ymax: %d %d %d %d\n",my_rank,*min_x,*max_x,*min_y,*max_y);
-	return 0;
+    *min_x = my_rank * base + (my_rank < rest ? my_rank : rest);
+    *max_x = *min_x + base + (my_rank < rest ? 1 : 0);
+
+    *min_y = 0;
+    *max_y = ny;
+
+    printf("Rank %d domain: xmin=%d xmax=%d ymin=%d ymax=%d\n", my_rank, *min_x, *max_x, *min_y, *max_y);
+    return 0;
 }
 
 int halo_comm(params p, int my_rank, int size, double** u, double* fromLeft, double* fromRight){
-	
-	/*this function, vectors fromLeft and fromRight should be received from the neighbours of my_rank process*/
-	/*if you want to implement also cartesian topology, you need fromTop and fromBottom in addition to fromLeft a
-	nd fromRight*/
+    int left  = (my_rank == 0) ? MPI_PROC_NULL : my_rank - 1;
+    int right = (my_rank == size - 1) ? MPI_PROC_NULL : my_rank + 1;
 
-	for (int j=0;j<(p.ymax - p.ymin);j++) {fromLeft[j] = 0; fromRight[j] = 0;} //initialize fromLeft and fromRight
+    int nx_local = p.xmax - p.xmin;
+    int ny_local = p.ymax - p.ymin;
 
-    /* define columns to be sent to right neighbour and to the left neighbour, 
-    also receive one both form left and right neighbour*/
+    double* sendLeft  = new double[ny_local];
+    double* sendRight = new double[ny_local];
 
-    /* choose either to define MPIcolumn_type (lines 43-45) or define 
-    the columns to be sent manually (lines 53-56)*/
+    for (int j = 0; j < ny_local; j++) {
+        sendLeft[j]  = u[1][j];
+        sendRight[j] = u[nx_local][j]; 
+    }
 
-    // MPI_Datatype column_type;
-    // MPI_Type_vector(p.ymax - p.ymin, 1, p.xmax - p.xmin, MPI_DOUBLE, &column_type);
-    // MPI_Type_commit(&column_type);
+    MPI_Request reqs[4];
 
-    // ...some code goes here and then do not forget to free the column_type
+    MPI_Irecv(fromLeft,  ny_local, MPI_DOUBLE, left,  0, MPI_COMM_WORLD, &reqs[0]);
+    MPI_Irecv(fromRight, ny_local, MPI_DOUBLE, right, 1, MPI_COMM_WORLD, &reqs[1]);
 
-    // MPI_Type_free(&column_type);
+    MPI_Isend(sendRight, ny_local, MPI_DOUBLE, right, 0, MPI_COMM_WORLD, &reqs[2]);
+    MPI_Isend(sendLeft,  ny_local, MPI_DOUBLE, left,  1, MPI_COMM_WORLD, &reqs[3]);
 
-	//or alternative approach below
+    MPI_Waitall(4, reqs, MPI_STATUSES_IGNORE);
 
-	// double* column_to_right = new double [p.ymax - p.ymin];
-	// for (int j=0;j<(p.ymax - p.ymin);j++) column_to_right[j] = u[p.xmax - p.xmin - 1][j]; 
-	// double* column_to_left = new double [p.ymax - p.ymin];
-	// for (int j=0;j<(p.ymax - p.ymin);j++) column_to_left[j] = u[0][j]; 
+    if (left != MPI_PROC_NULL)
+        for (int j = 0; j < ny_local; j++) u[0][j] = fromLeft[j];
+    if (right != MPI_PROC_NULL)
+        for (int j = 0; j < ny_local; j++) u[nx_local+1][j] = fromRight[j];
 
+    delete[] sendLeft;
+    delete[] sendRight;
 
-	printf("mpi_module.cpp, define halo comm:  \n");
-	return 0;
+    return 0;
 }
-
 
 int ALLREDUCE(double* loc_diff, double* loc_sumdiff){
 

@@ -1,6 +1,7 @@
 #include "jacobi.h"
 #include <math.h>
 #include "mpi_module.h"
+#include <mpi.h>
 
 /**
  * @brief      Computes norm of the difference between two matrices
@@ -12,17 +13,21 @@
  * @return     Returns \sqrt{\sum(mat1_{ij} - mat2_{ij})^2/(nx*ny)}
  */
 double norm_diff(params p, double** mat1, double** mat2){
+    double local_sum = 0.0;
+    int nx_local = p.xmax - p.xmin;
+    int ny_local = p.ymax - p.ymin;
 
-    printf("Here, in norm_diff() function, change the serial implementation to MPI setup\n");
-    double ret=0., diff=0.;
-    for (int i=0; i<p.nx; i++){
-        for (int j=0; j<p.ny; j++){
-            diff = mat1[i][j] - mat2[i][j];
-            ret += diff*diff;
+    for (int i = 1; i <= nx_local; i++){       
+        for (int j = 0; j < ny_local; j++){
+            double diff = mat1[i][j] - mat2[i][j];
+            local_sum += diff * diff;
         }
     }
-    ret = sqrt(ret/(p.nx*p.ny));
-    return ret;
+
+    double global_sum = 0.0;
+    MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    double norm = sqrt(global_sum / (p.nx * p.ny));
+    return norm;
 }
 
 /**
@@ -34,30 +39,33 @@ double norm_diff(params p, double** mat1, double** mat2){
  * @param      u_old  The old solution
  * @param      f      The source term
  */
+
 void jacobi_step(params p, double** u_new, double** u_old, double** f, int my_rank, int size){
     double dx = 1.0/((double)p.nx - 1);
     double dy = 1.0/((double)p.ny - 1);
 
-    double* fromLeft = new double[p.ymax - p.ymin]; 
-    double* fromRight = new double[p.ymax - p.ymin];
+    int nx_local = p.xmax - p.xmin;
+    int ny_local = p.ymax - p.ymin;
 
-    for (int i=p.xmin; i<p.xmax; i++){
-        for (int j=p.ymin; j<p.ymax; j++){
-            u_old[i - p.xmin][j - p.ymin] = u_new[i - p.xmin][j - p.ymin];
+    double* fromLeft = new double[ny_local];
+    double* fromRight = new double[ny_local];
+
+    for (int i = 1; i <= nx_local; i++){                  
+        for (int j = 0; j < ny_local; j++){
+            u_old[i][j] = u_new[i][j];
         }
     }
 
-    halo_comm(p, my_rank, size, u_new, fromLeft, fromRight); 
+    halo_comm(p, my_rank, size, u_new, fromLeft, fromRight);
 
-    printf("Function jacobi_step in jacobi.cpp : adapt the update of u_new.\n");
-    for (int i=p.xmin; i<p.xmax; i++){
-        if (i==0 || i==p.nx-1) continue;
-        for (int j=p.ymin; j<p.ymax; j++){
-            if (j==0 || j==p.ny-1) continue;
-            int idx = i-p.xmin;
-            int idy = j-p.ymin;
-            u_new[idx][idy] = 0.25*(u_old[idx-1][idy] + u_old[idx+1][idy] + u_old[idx][idy-1] + u_old[idx][idy+1] - dx*dy*f[idx][idy]);
+    for (int i = 1; i <= nx_local; i++){                   
+        if (i==1 && my_rank==0) continue;                 
+        if (i==nx_local && my_rank==size-1) continue;     
+        for (int j = 1; j < ny_local-1; j++){          
+            u_new[i][j] = 0.25*(u_old[i-1][j] + u_old[i+1][j] + u_old[i][j-1] + u_old[i][j+1] - dx*dy*f[i][j]);
         }
     }
-    if (p.nx!=p.ny) printf("In function jacobi_step (jacobi.cpp l.26): nx != ny, check jacobi updates\n");
+
+    delete[] fromLeft;
+    delete[] fromRight;
 }

@@ -30,21 +30,24 @@ int main(void) {
 	size_t size = NUM_BLOCK*NUM_THREAD*sizeof(double);  //Array memory size
 	sumHost = (double *)malloc(size);  //  Allocate array on host
 	cudaMalloc((void **) &sumDev, size);  // Allocate array on device
-   	double start = getTime();
+        
+        for (int j=0; j<5; j++) {
+		double start = getTime();
+		// Initialize array in device to 0
+		cudaMemset(sumDev, 0, size);
+		// Do calculation on device
+		cal_pi <<<dimGrid, dimBlock>>> (sumDev, NBIN, step, NUM_THREAD, NUM_BLOCK); // call CUDA kernel
+		// Retrieve result from device and store it in host array
+		cudaMemcpy(sumHost, sumDev, size, cudaMemcpyDeviceToHost);
+		for(tid=0; tid<NUM_THREAD*NUM_BLOCK; tid++)
+			pi += sumHost[tid];
+		pi *= step;
 
-	// Initialize array in device to 0
-	cudaMemset(sumDev, 0, size);
-	// Do calculation on device
-	cal_pi <<<dimGrid, dimBlock>>> (sumDev, NBIN, step, NUM_THREAD, NUM_BLOCK); // call CUDA kernel
-	// Retrieve result from device and store it in host array
-	cudaMemcpy(sumHost, sumDev, size, cudaMemcpyDeviceToHost);
-	for(tid=0; tid<NUM_THREAD*NUM_BLOCK; tid++)
-		pi += sumHost[tid];
-	pi *= step;
+		// Print results
+		double delta = getTime() - start;
+		printf("PI = %.16g computed in %.4g seconds\n", pi, delta);
+	}
 
-	// Print results
-	double delta = getTime() - start;
-	printf("PI = %.16g computed in %.4g seconds\n", pi, delta);
 	// Cleanup
 	free(sumHost);
 	cudaFree(sumDev);

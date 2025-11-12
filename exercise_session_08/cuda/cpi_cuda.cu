@@ -4,8 +4,6 @@
 extern "C" double getTime(void);
 
 #define NBIN 1000000000  // Number of bins
-#define NUM_BLOCK  (2*56)  // Number of thread blocks
-#define NUM_THREAD  (2*8)  // Number of threads per block
 
 // Kernel that executes on the CUDA device
 __global__ void cal_pi(double *sum, int nbin, double step, int nthreads, int nblocks) {
@@ -19,7 +17,10 @@ __global__ void cal_pi(double *sum, int nbin, double step, int nthreads, int nbl
 }
 
 // Main routine that executes on the host
-int main(void) {
+int main(int argc, char* argv[]) {
+	int NUM_BLOCK = (argc > 1) ? atoi(argv[1]) : (2*56);
+    	int NUM_THREAD = (argc > 2) ? atoi(argv[2]) : (2*8);
+
 	dim3 dimGrid(NUM_BLOCK,1,1);  // Grid dimensions
 	dim3 dimBlock(NUM_THREAD,1,1);  // Block dimensions
 	double *sumHost, *sumDev;  // Pointer to host & device arrays
@@ -31,22 +32,20 @@ int main(void) {
 	sumHost = (double *)malloc(size);  //  Allocate array on host
 	cudaMalloc((void **) &sumDev, size);  // Allocate array on device
         
-        for (int j=0; j<5; j++) {
-		double start = getTime();
-		// Initialize array in device to 0
-		cudaMemset(sumDev, 0, size);
-		// Do calculation on device
-		cal_pi <<<dimGrid, dimBlock>>> (sumDev, NBIN, step, NUM_THREAD, NUM_BLOCK); // call CUDA kernel
-		// Retrieve result from device and store it in host array
-		cudaMemcpy(sumHost, sumDev, size, cudaMemcpyDeviceToHost);
-		for(tid=0; tid<NUM_THREAD*NUM_BLOCK; tid++)
-			pi += sumHost[tid];
-		pi *= step;
-
-		// Print results
-		double delta = getTime() - start;
-		printf("PI = %.16g computed in %.4g seconds\n", pi, delta);
-	}
+       
+	double start = getTime();
+	// Initialize array in device to 0
+	cudaMemset(sumDev, 0, size);
+	// Do calculation on device
+	cal_pi <<<dimGrid, dimBlock>>> (sumDev, NBIN, step, NUM_THREAD, NUM_BLOCK); // call CUDA kernel
+	// Retrieve result from device and store it in host array
+	cudaMemcpy(sumHost, sumDev, size, cudaMemcpyDeviceToHost);
+	for(tid=0; tid<NUM_THREAD*NUM_BLOCK; tid++)
+		pi += sumHost[tid];
+	pi *= step;
+	// Print results
+	double delta = getTime() - start;
+	printf("PI = %.16g computed in %.4g seconds\n", pi, delta);
 
 	// Cleanup
 	free(sumHost);

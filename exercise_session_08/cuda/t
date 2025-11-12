@@ -1,0 +1,77 @@
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  cray-python: cray-python/3.11.5
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    Sie müssen alle Module in einer der nachfolgenden Zeilen laden bevor Sie das Modul "cray-python/3.11.5" laden können.
+
+      cray/23.12
+ 
+    Help:
+      
+      This modulefile defines the system paths and environment
+      variables needed to use cray-python.
+      
+      cray-python 3.11.5
+      ====================
+      
+      Release Date
+      ------------
+      December 2023
+      
+      Purpose
+      -------
+      Cray Python is an implementation of the Python programming language for the Cray
+      Programming Environment. The numpy and scipy modules are configured to call Cray
+      Libsci routines. The mpi4py module is configured to call Cray MPICH routines.
+      Cray Python is designed to run Python codes on the compute nodes of an HPE
+      supercomputer. HPE does not make changes to the Python source or any of its
+      libraries nor does it plan to make changes in future releases.
+      
+      The cray-python 3.11.5 release contains
+      
+      - python-3.11.5
+      - numpy-1.24.4
+      - scipy-1.10.1
+      - mpi4py-3.1.4
+      - dask-2023.6.1
+      
+      Product and OS Dependencies
+      ---------------------------
+      The cray-python 3.11.5 release is supported on
+      - Cray EX systems running SLES 15 or RHEL 8
+      
+      Documentation
+      -------------
+      https://www.python.org/doc
+      
+      Changelog
+      ---------
+      https://docs.python.org/release/3.11.5/whatsnew/changelog.html
+      
+      Modulefile
+      ----------
+          module load cray-python/3.11.5
+      
+      Installation
+      ------------
+          rpm -ihv cray-python-3.11.5-20231129200832.e261792-1.sles15sp5.aarch64.rpm
+      
+      To make this the default version, execute
+      
+          /opt/cray/pe/admin-pe/set_default_files/set_default_python_3.11.5
+      
+      Certain components, files, or programs contained within this package are
+      © Copyright 2021-2023 Hewlett Packard Enterprise Development LP
+      
+      
+      ===================================================================
+      To re-display python/3.11.5 release information,
+      type:    less /opt/cray/pe/python/3.11.5/release_info
+      ===================================================================
+      
+      
+
+
+ 
+

@@ -53,4 +53,40 @@ GPU version took 2.86165 s (0.0286165 s/step)
 
 The no copies version is almost double as fast as the naive version.
 
+### Exercise 3
+
+• Why is this function prone to race conditions?
+
+Each thread reads sum, adds to it, and writes it back.
+On a GPU, this will cause lost updates, inconsistent results and nondeterministic output.
+This makes the naive parallel version unsafe unless you synchronize or use a reduction.
+
+• What keyword is used to prevent this?
+
+OpenACC uses:
+
+reduction(+:sum)
+
+This tells the compiler to give each thread (or gang/worker/vector) a private copy of sum, sum them safely at the end and avoid race conditions.
+
+• How well does the GPU code perform compared to the CPU version?
+
+output:
+
+```
+[daint][mtuor@daint-ln004 basics]$ srun --account=uzh8 --constraint=gpu -n 1 ./dot.openacc 24
+srun: job 2106583 queued and waiting for resources
+srun: job 2106583 has been allocated resources
+dot product OpenACC of length n = 16777216 : 128MB
+expected 1.51016e+08 got 1.51016e+08: success
+Host kernel took 0.0629333 s
+GPU kernel took 3.38944 s
+```
+
+Again much slower.
+
+
+
+
+
 

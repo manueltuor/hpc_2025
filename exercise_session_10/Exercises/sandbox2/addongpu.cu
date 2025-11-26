@@ -12,13 +12,11 @@
 
 __global__ void kernadd (float* mout, float* min1, float *min2, int nx, int ny)
 {
-  int i, j, index;
-  index = blockDim.x*blockIdx.x+threadIdx.x;
-  j = index/nx;
-  i = index - j*nx;
-  if ((i < nx) && (j < ny))
-    mout[index] = min1[index] + min2[index];
-    
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (i < nx && j < ny)
+        mout[j*nx + i] = min1[j*nx + i] + min2[j*nx + i];
 }
 
 
@@ -51,27 +49,25 @@ int main () {
 
   /* Matrix allocation on device */
   float *mat_out_gpu, *mat_in1_gpu, *mat_in2_gpu;
-  /* TO DO : do the allocation below, using cudaMalloc()*/
-  
+  cudaMalloc(&mat_out_gpu, nx*ny*sizeof(float));
+  cudaMalloc(&mat_in1_gpu, nx*ny*sizeof(float));
+  cudaMalloc(&mat_in2_gpu, nx*ny*sizeof(float)); 
 
   /* Matrix initialization */
   Init(mat_in1, nx, ny);
   Init(mat_in2, nx, ny);  
   
-  /* TO DO : write below the instructions to copy it to the device */
+  cudaMemcpy(mat_in1_gpu, mat_in1, nx*ny*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(mat_in2_gpu, mat_in2, nx*ny*sizeof(float), cudaMemcpyHostToDevice);
+  
+  dim3 threadsPerBlock(16, 16);
+  dim3 numBlocks( (nx + threadsPerBlock.x - 1) / threadsPerBlock.x, (ny + threadsPerBlock.y - 1) / threadsPerBlock.y );
+  kernadd<<<numBlocks, threadsPerBlock>>>(mat_out_gpu, mat_in1_gpu, mat_in2_gpu, nx, ny);
 
-  
-  /* TO DO : complete the number of blocks below */
-  int numBlocks = ...;
- 
-  /* TO DO : kernel invocation */
-  
-  
   cudaDeviceSynchronize();
   
   /* We now transfer back the matrix from the device to the host */
-  /* TO DO : write cudaMemcpy() instruction below */
-  
+  cudaMemcpy(mat_out, mat_out_gpu, nx*ny*sizeof(float), cudaMemcpyDeviceToHost);
     
   /* free memory */
   cudaFree(mat_out_gpu);

@@ -1,6 +1,7 @@
 #include <random>
 #include <vector>
 #include <cmath>
+#include <omp.h>
 using std::vector;
 
 struct particles {
@@ -34,6 +35,7 @@ void ic(particles &plist, int n) {
 void forces(particles &plist) {
     int n = plist.x.size();
 
+    #pragma omp parallel for schedule(static) default(none) shared(plist, n)
     for (int i = 0; i < n; ++i) {
         float ax = 0, ay = 0, az = 0;
 
@@ -66,7 +68,7 @@ void forces(particles &plist) {
 }
 
 int main(int argc, char *argv[]) {
-    int N = 50000;
+    int N = 500000;
 
     particles plist;
     ic(plist, N);

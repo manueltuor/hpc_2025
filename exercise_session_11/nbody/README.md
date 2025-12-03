@@ -40,3 +40,10 @@ Conclusion: Performance is dominated by the force computation loop and could ben
 - Vectorization
 - GPU offloading
 - Reducing STL overhead
+
+### Exercise 2
+
+| function | Runtime (s) |
+|-----------------|------|
+| sqrt       | 12.818 | 
+| sqrtf       | 7.231 | 

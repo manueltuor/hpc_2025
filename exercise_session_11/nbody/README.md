@@ -47,3 +47,34 @@ Conclusion: Performance is dominated by the force computation loop and could ben
 |-----------------|------|
 | sqrt       | 12.818 | 
 | sqrtf       | 7.231 | 
+
+### Exercise 3
+
+**Initial Vectorisation Report**
+
+```
+/usr/include/c++/7/bits/random.tcc:412:42: note: loop vectorized
+/usr/include/c++/7/bits/random.tcc:404:32: note: loop vectorized
+```
+
+**Vectorisation Report after optimisation**
+
+```
+/usr/include/c++/7/bits/stl_algobase.h:695:22: note: loop vectorized
+/usr/include/c++/7/bits/stl_algobase.h:695:22: note: loop vectorized
+/usr/include/c++/7/bits/stl_algobase.h:753:13: note: loop vectorized
+/usr/include/c++/7/bits/stl_algobase.h:753:13: note: loop vectorized
+/usr/include/c++/7/bits/random.tcc:412:42: note: loop vectorized
+/usr/include/c++/7/bits/random.tcc:404:32: note: loop vectorized
+```
+
+In the first run, the compiler only reported vectorizations in the used libraries and after optimizing also the ones in the own code.
+
+**Time:**
+
+It takes longer, not sure why.
+```
+real	0m11.246s
+user	0m11.229s
+sys	    0m0.013s
+```

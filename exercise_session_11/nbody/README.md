@@ -70,11 +70,23 @@ Conclusion: Performance is dominated by the force computation loop and could ben
 
 In the first run, the compiler only reported vectorizations in the used libraries and after optimizing also the ones in the own code.
 
-**Time:**
+**Runtime:**
 
 It takes longer, not sure why.
 ```
-real	0m11.246s
-user	0m11.229s
-sys	    0m0.013s
+real	0m 11.246s
+user	0m 11.229s
+sys	    0m 0.013s
 ```
+
+### Exercise 4
+
+Runtime now improved significantly
+
+```
+real	0m 3.196s
+user	0m 3.189s
+sys	    0m 0.000s
+```
+
+

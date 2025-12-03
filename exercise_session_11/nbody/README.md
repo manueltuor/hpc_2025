@@ -89,4 +89,33 @@ user	0m 3.189s
 sys	    0m 0.000s
 ```
 
+### Exercise 5
+
+**Data Dependencies:**
+
+There are no data dependencies between iterations. Each i can be computed independently. No atomics are needed.
+
+**Runtime (OpenMP):**
+
+```
+real	0m 0.084s
+user	0m 8.244s
+sys	    0m 1.014s
+```
+
+**Runtime (N=500'000):**
+
+```
+real	0m 3.822s
+user	5m 58.643s
+sys	    0m 0.149s
+```
+
+**Difference between real and user times:**
+
+**Real:**
+wall-clock time on all cores
+
+**User:**
+sum of CPU time across threads (≈ real × number of threads if fully utilized)
 

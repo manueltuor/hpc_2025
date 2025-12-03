@@ -28,7 +28,7 @@ Below I summarized a couple of the key metrics.
 
 **Total samples:** 1280
 
-## Interpretation
+#### Interpretation
 
 The performance analysis shows that almost all execution time (100%) is spent inside `main()`, and more than 80% is concentrated within three adjacent lines in `nbody.cpp` (lines 38–40).
 Line 40 is the main performance hotspot (56.5%), which indicates the primary computational kernel of the N-body simulation (likely the nested force calculation loop). Line 39 (22.9%) contributes significantly, likely controlling accumulation of results.
